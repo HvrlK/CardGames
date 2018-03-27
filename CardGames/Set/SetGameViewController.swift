@@ -18,8 +18,6 @@ class SetGameViewController: UIViewController {
     
     lazy var cardBehavior = CardBehavior(in: animator)
     
-    private var isAnimating = false
-    
     // MARK: outlets
     
     @IBOutlet private var scoreLabel: UILabel!
@@ -84,10 +82,6 @@ class SetGameViewController: UIViewController {
         
     }
     
-    override open var shouldAutorotate: Bool {
-        return !isAnimating
-    }
-    
     
     // MARK: private functions
     
@@ -98,11 +92,11 @@ class SetGameViewController: UIViewController {
             if let cardView = recognizer.view! as? SetCardView {
                 setGame.selectCard(at: boardView.cardViews.index(of: cardView)!)
             }
+            updateViewFromModel()
             flyAway()
         default:
             break
         }
-        updateBorders()
     }
     
     @objc
@@ -196,22 +190,16 @@ class SetGameViewController: UIViewController {
         for index in cardsInGame.indices {
             let card = cardsInGame[index]
             let cardView = boardView.cardViews[index]
-            cardView.layer.borderWidth = boardView.cardViews[index].frame.size.width * 0.03
+            cardView.layer.borderWidth = cardView.frame.size.width * 0.03
             cardView.layer.borderColor = UIColor.clear.cgColor
             if selectCards.contains(card) {
                 if selectCards.count < 3 {
                     cardView.layer.borderColor = #colorLiteral(red: 0.9258407361, green: 0.8299284639, blue: 0.2816037281, alpha: 1)
                 } else {
-                    cardView.layer.borderColor = setGame.matching ? #colorLiteral(red: 0.3188554938, green: 0.8112507932, blue: 0.2382250434, alpha: 1) : #colorLiteral(red: 0.9845732868, green: 0.4010361191, blue: 0.3556970509, alpha: 1)
+                    cardView.layer.borderColor = !setGame.matching ? #colorLiteral(red: 0.9845732868, green: 0.4010361191, blue: 0.3556970509, alpha: 1) : UIColor.clear.cgColor
                 }
             }
         }
-    }
-    
-    private func isButtonOn(state: Bool) {
-        newGameButton.isUserInteractionEnabled = state
-        dealtButton.isUserInteractionEnabled = state
-        hintButton.isUserInteractionEnabled = state
     }
     
     private func addTapGestureRecognizer(for cardView: SetCardView) {
@@ -281,15 +269,12 @@ class SetGameViewController: UIViewController {
     }
     
     private func layingOutAnimation() {
-        if !dealtButton.isHidden {
-            isButtonOn(state: false)
-        }
+        view.isUserInteractionEnabled = false
         var time = 0.0
         var count = 0
         for index in boardView.cardViews.indices {
             let cardView = boardView.cardViews[index]
             if !cardView.isFaceUp, !dealtButton.isHidden {
-                isAnimating = true
                 time += 0.3
                 cardView.alpha = 1
                 let startFrame = cardView.frame
@@ -316,8 +301,7 @@ class SetGameViewController: UIViewController {
                             completion: { _ in
                                 count += 1
                                 if index == self.boardView.cardViews.count - 1 || (self.setGame.deck.count != 69 && count == 3) {
-                                    self.isButtonOn(state: true)
-                                    self.isAnimating = false
+                                    self.view.isUserInteractionEnabled = true
                                 }
                         })
                 })
