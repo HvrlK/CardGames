@@ -25,7 +25,7 @@ class SetGame
     
     init() {
         initDeck()
-//        draw(GameConstant.numberOfInitialCards)
+        draw(GameConstant.numberOfInitialCards)
     }
     
     func selectCard(at index: Int) {
@@ -70,11 +70,7 @@ class SetGame
             }
         } else {
             score = hint() == true ? score + GameConstant.dealCardsPenalty : score
-            if cardsInGame.count != 0 {
-                draw(GameConstant.numberOfCardsPerDeal)
-            } else {
-                draw(GameConstant.numberOfInitialCards)
-            }
+            draw(GameConstant.numberOfCardsPerDeal)
         }
         matching = false
     }
@@ -111,18 +107,6 @@ class SetGame
     func canHint() -> Bool {
         return hint() && !matching
     }
-    
-    func tapNewGame() -> Bool {
-        return deck.isEmpty && !hint()
-    }
-    
-//    func tapHint() -> Bool {
-//        if -time.timeIntervalSinceNow >= 30 {
-//            return true
-//        } else {
-//            return false
-//        }
-//    }
     
     func reset() {
         deck.removeAll()
@@ -180,7 +164,6 @@ class SetGame
     }
     
 }
-
 
 extension SetGame {
     private struct GameConstant {

@@ -42,9 +42,6 @@ class SetGameViewController: UIViewController {
     // MARK: actions
     
     @IBAction func dealtCards(_ sender: UIButton) {
-        if setGame.cardsInGame.count == 0 {
-            startGame()
-        }
         setGame.dealtCards()
         updateViewFromModel()
         layingOutAnimation()
@@ -59,6 +56,9 @@ class SetGameViewController: UIViewController {
     }
     
     @IBAction func newGame(_ sender: UIButton) {
+        if !startGameLabel.isHidden {
+            startGame()
+        }
         dealtButton.isHidden = false
         boardView.cardViews.removeAll()
         setGame.reset()
@@ -77,9 +77,8 @@ class SetGameViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.layoutSubviews()
-        newGameButton.alpha = 0
-        
+        dealtButton.alpha = 0
+        hintButton.alpha = 0
     }
     
     
@@ -116,7 +115,8 @@ class SetGameViewController: UIViewController {
             delay: 0,
             options: [],
             animations: {
-                self.newGameButton.alpha = 1
+                self.dealtButton.alpha = 1
+                self.hintButton.alpha = 1
                 self.startGameLabel.alpha = 0
         },
             completion: {_ in
@@ -128,7 +128,7 @@ class SetGameViewController: UIViewController {
         dealtButton.isEnabled = setGame.canDealMoreCards()
         hintButton.isEnabled = setGame.canHint()
         updateCardViewsFromModel()
-        scoreLabel.text = "\(setGame.score)"
+        scoreLabel.text = "Score: \(setGame.score)"
         updateBorders()
     }
     
@@ -269,7 +269,9 @@ class SetGameViewController: UIViewController {
     }
     
     private func layingOutAnimation() {
-        view.isUserInteractionEnabled = false
+        if !setGame.deck.isEmpty {
+            view.isUserInteractionEnabled = false
+        }
         var time = 0.0
         var count = 0
         for index in boardView.cardViews.indices {
